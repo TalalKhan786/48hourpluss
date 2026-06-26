@@ -3,8 +3,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { randomUUID } from 'crypto';
+import { revalidatePath } from 'next/cache'; // <-- Import Next.js cache revalidation utility [1]
 
-// GET: Retrieve all active hero slides (used by homepage)
 export async function GET() {
   try {
     const dbSlides = await prisma.heroSlide.findMany({
@@ -18,7 +18,6 @@ export async function GET() {
   }
 }
 
-// POST: Create or update a hero slide
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
         subtitle: body.subtitle || null,
         imageUrl: body.imageUrl,
         linkUrl: body.linkUrl || null,
-        order: body.order ?? 0,
+        order: Number(body.order) ?? 0,
         isActive: body.isActive ?? true,
       },
       create: {
@@ -45,14 +44,20 @@ export async function POST(request: NextRequest) {
         subtitle: body.subtitle || null,
         imageUrl: body.imageUrl,
         linkUrl: body.linkUrl || null,
-        order: body.order ?? 0,
+        order: Number(body.order) ?? 0,
         isActive: body.isActive ?? true,
       },
     });
 
+    /* ==========================================================================
+       ON-DEMAND CACHE CLEARING (BANNER SLIDES)
+       Instantly purges the homepage cache to display updated custom slides [1].
+       ========================================================================== */
+    revalidatePath('/');
+
     return NextResponse.json(savedSlide, { status: 201 });
   } catch (error) {
     console.error('Save slide API error:', error);
-    return NextResponse.json({ error: 'Failed to save slide record' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to save slide record in database' }, { status: 500 });
   }
 }

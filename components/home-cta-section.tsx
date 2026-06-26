@@ -16,13 +16,6 @@ export function HomeCtaSection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/products/48-hours-plus-herbal-honey">
-            <Button
-              size="lg"
-              className="bg-yellow-500 hover:bg-yellow-400 text-black text-lg px-8 py-4 h-auto w-full sm:w-auto"
-            >
-              View Product Details
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
           </Link>
           <Button
             size="lg"

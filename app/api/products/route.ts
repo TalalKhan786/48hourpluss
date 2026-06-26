@@ -3,9 +3,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts, saveProduct } from '@/lib/db';
 import { Product } from '@/lib/types';
-import { randomUUID } from 'crypto'; // <-- Native Node.js UUID generator
+import { randomUUID } from 'crypto';
+import { revalidatePath } from 'next/cache'; // <-- Import Next.js cache revalidation utility [1]
 
-// GET: Retrieve products
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -19,7 +27,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Create or Update a product with strict UUID compliance
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -29,7 +36,6 @@ export async function POST(request: NextRequest) {
     }
 
     const newProduct: Product = {
-      // Ensure the ID is a compliant standard UUID (Prisma 7 Postgres standard)
       id: body.id || randomUUID(),
       name: body.name,
       slug: body.slug,
@@ -44,6 +50,15 @@ export async function POST(request: NextRequest) {
     };
 
     const saved = await saveProduct(newProduct);
+
+    /* ==========================================================================
+       ON-DEMAND CACHE CLEARING (PRODUCTS)
+       Instantly purges the Edge CDN cache for your storefront views [1].
+       ========================================================================== */
+    revalidatePath('/'); // Purge homepage featured grid [1]
+    revalidatePath('/products'); // Purge main product catalog list [1]
+    revalidatePath('/products/[slug]', 'layout'); // Purge individual product specifications subpage [1]
+
     return NextResponse.json(saved, { status: 201 });
   } catch (error) {
     console.error("Save product API failure:", error);

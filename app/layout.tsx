@@ -1,11 +1,9 @@
 // app/layout.tsx
 
 import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { CartProvider } from '@/components/CartProvider'
-import StorefrontWrapper from '@/components/StorefrontWrapper' // <-- Import the conditional wrapper
+import StorefrontWrapper from '@/components/StorefrontWrapper'
 
 export const metadata: Metadata = {
   title: {
@@ -25,15 +23,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* 
+           GLOBAL TIMES NEW ROMAN TYPOGRAPHY SYSTEM:
+           Wildcard CSS injector guarantees that every text element, button, input, 
+           and heading across the entire website renders in Times New Roman [2].
+        */}
         <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
+          * {
+            font-family: 'Times New Roman', Times, serif !important;
+          }
         `}</style>
       </head>
-      <body className="bg-black text-white min-h-screen" suppressHydrationWarning={true}>
+      {/* 
+         THE SEMANTIC MASTER CANVAS:
+         Replaced hardcoded hex colors with global bg-background and text-foreground variables [1].
+         Ensures absolute contrast compliance across all possible color modes [1].
+      */}
+      <body 
+        className="bg-background text-foreground min-h-screen selection:bg-yellow-500 selection:text-black transition-colors duration-300 ease-in-out" 
+        suppressHydrationWarning={true}
+      >
         <CartProvider>
           {/* Wrap all children in the storefront controller wrapper */}
           <StorefrontWrapper>

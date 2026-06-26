@@ -56,3 +56,66 @@ export interface DatabaseSchema {
   offers: Offer[];
   heroSlides: HeroSlide[];
 }
+
+// lib/types.ts (Append to the end)
+
+export interface ShowcaseVideo {
+  id: string;
+  title: string;
+  badgeText: string; // e.g., "Product Demo" or "Ingredients"
+  videoUrl: string; // Cloud URL or local path
+  order: number;
+  isActive: boolean;
+}
+
+// lib/types.ts (Append to the end)
+
+export interface VideoReview {
+  id: string;
+  author: string;
+  videoUrl: string;
+  thumbnailUrl?: string;
+  order: number;
+  isActive: boolean;
+}
+
+export interface TextReview {
+  id: string;
+  author: string;
+  rating: number;
+  comment: string;
+  date: string;
+  isActive: boolean;
+}
+
+// lib/db.ts (Append to the bottom)
+
+export async function getVideoReviews(options?: { includeInactive?: boolean }): Promise<VideoReview[]> {
+  const db = await prisma.videoReview.findMany({
+    where: options?.includeInactive ? undefined : { isActive: true },
+    orderBy: { order: 'asc' },
+  });
+  return db.map((v) => ({
+    id: v.id,
+    author: v.author,
+    videoUrl: v.videoUrl,
+    thumbnailUrl: v.thumbnailUrl || undefined,
+    order: v.order,
+    isActive: v.isActive,
+  }));
+}
+
+export async function getTextReviews(options?: { includeInactive?: boolean }): Promise<TextReview[]> {
+  const db = await prisma.textReview.findMany({
+    where: options?.includeInactive ? undefined : { isActive: true },
+    orderBy: { date: 'desc' },
+  });
+  return db.map((t) => ({
+    id: t.id,
+    author: t.author,
+    rating: t.rating,
+    comment: t.comment,
+    date: t.date,
+    isActive: t.isActive,
+  }));
+}

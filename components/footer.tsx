@@ -6,10 +6,9 @@ import Image from "next/image"
 export function Footer() {
   const quickLinks = [
     { name: "Products", href: "/products" },
-    { name: "Product Details", href: "/products/48-hours-plus-herbal-honey" },
     { name: "Certificates", href: "/certificates" },
     { name: "Reviews", href: "/reviews" },
-    { name: "Contact", href: "/contact" },
+    { name: "Contact US", href: "/contact" },
   ]
 
   const certifications = ["ISO 22000 Certified", "GMP Certified", "HACCP Certified", "Halal Certified", "Lab Tested"]

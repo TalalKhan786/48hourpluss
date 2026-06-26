@@ -76,3 +76,34 @@ model HeroSlide {
   order     Int      @default(0)
   isActive  Boolean  @default(true)
 }
+
+
+// prisma/schema.prisma (Append to the bottom of the file)
+
+model ShowcaseVideo {
+  id        String  @id @default(uuid())
+  title     String
+  badgeText String  // e.g. "Product Demo" or "Ingredients"
+  videoUrl  String
+  order     Int     @default(0)
+  isActive  Boolean @default(true)
+}
+// prisma/schema.prisma (Append to the bottom)
+
+model VideoReview {
+  id           String   @id @default(uuid())
+  author       String
+  videoUrl     String
+  thumbnailUrl String?
+  order        Int      @default(0)
+  isActive     Boolean  @default(true)
+}
+
+model TextReview {
+  id        String   @id @default(uuid())
+  author    String
+  rating    Int
+  comment   String
+  date      String
+  isActive  Boolean  @default(true)
+}

@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+// app/admin/layout.tsx
 import { 
   LayoutDashboard, 
   Package, 
@@ -12,9 +13,12 @@ import {
   LogOut, 
   Menu, 
   X, 
-  ExternalLink 
+  ExternalLink,
+  Film,
+  Star // <-- Add this icon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -37,12 +41,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
   };
 
-  const navItems = [
-    { name: 'Overview', href: '/admin', icon: LayoutDashboard },
-    { name: 'Products', href: '/admin/products', icon: Package },
-    { name: 'Categories', href: '/admin/categories', icon: FolderTree },
-    { name: 'Hero Slides', href: '/admin/hero-slides', icon: Sliders },
-  ];
+const navItems = [
+  { name: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { name: 'Products', href: '/admin/products', icon: Package },
+  { name: 'Categories', href: '/admin/categories', icon: FolderTree },
+  { name: 'Hero Slides', href: '/admin/hero-slides', icon: Sliders },
+  { name: 'Videos', href: '/admin/showcase-videos', icon: Film },
+  { name: 'Reviews', href: '/admin/reviews', icon: Star }, // <-- Add this tab
+];
+  
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col md:flex-row">

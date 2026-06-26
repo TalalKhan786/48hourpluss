@@ -14,8 +14,8 @@ const navLinks = [
   { name: "Products", href: "/products" },
   { name: "Certificates", href: "/certificates" },
   { name: "Reviews", href: "/reviews" },
-  { name: "Contact", href: "/contact" },
-]
+  { name: "Elixir Guide", href: "/contact" }, // <-- Updated name, keeping the existing /contact URL route
+];
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

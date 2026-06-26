@@ -83,8 +83,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const getCartSubtotal = () => {
     return cart.reduce((total, item) => {
-      // Parse numeric value from price string (e.g., "$24.99" -> 24.99)
-      const numericPrice = parseFloat(item.product.price.replace(/[^0-9.]/g, ''));
+      // Use parseInt and strip everything except digits (/[^0-9]/g) to prevent the dot in "Rs." from corrupting the number!
+      const numericPrice = parseInt(item.product.price.replace(/[^0-9]/g, ''), 10);
       return total + (isNaN(numericPrice) ? 0 : numericPrice * item.quantity);
     }, 0);
   };

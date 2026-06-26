@@ -2,12 +2,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getProductBySlug, prisma } from '@/lib/db';
+import { revalidatePath } from 'next/cache'; // <-- Import Next.js cache revalidation utility [1]
 
 interface RouteParams {
   params: Promise<{ slug: string }> | { slug: string };
 }
 
-// GET: Fetch product by slug
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const resolvedParams = await params;
@@ -23,15 +23,21 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// DELETE: Remove product and cascaded relations from Supabase
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const resolvedParams = await params;
     
-    // Deletes product; Prisma will cascade delete matching reviews, images, and ingredients
     await prisma.product.delete({
       where: { slug: resolvedParams.slug },
     });
+
+    /* ==========================================================================
+       ON-DEMAND CACHE CLEARING (PRODUCT DELETION)
+       Instantly removes deleted items from storefront CDN caches [1].
+       ========================================================================== */
+    revalidatePath('/');
+    revalidatePath('/products');
+    revalidatePath('/products/[slug]', 'layout');
 
     return NextResponse.json({ success: true, message: 'Product deleted successfully' }, { status: 200 });
   } catch (error) {

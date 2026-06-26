@@ -5,6 +5,15 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { put } from '@vercel/blob';
 
+// Increase the Next.js body size limit to support uploading larger MP4 video files
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb', // Raised from 4MB to 50MB
+    },
+  },
+};
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -14,16 +23,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided in request' }, { status: 400 });
     }
 
-    // Convert file data to an array buffer for writing
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     /* ==========================================================================
-       OPTION 1: VERCEL BLOB CLOUD UPLOAD (PRODUCTION ACTIVE STATE)
-       Automatically runs if the secure read/write token is configured.
+       OPTION 1: VERCEL BLOB CLOUD UPLOAD
        ========================================================================== */
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      // Upload directly to Vercel's edge network
       const blob = await put(file.name, file, { 
         access: 'public',
         contentType: file.type 
@@ -37,22 +43,15 @@ export async function POST(request: NextRequest) {
     }
 
     /* ==========================================================================
-       OPTION 2: LOCAL DISK UPLOAD (DEVELOPMENT FALLBACK STATE)
-       Gracefully falls back to public/uploads directory if offline or unconfigured.
+       OPTION 2: LOCAL DISK UPLOAD
        ========================================================================== */
     const uploadDirectory = path.join(process.cwd(), 'public', 'uploads');
-    
-    // Ensure nested folder structure exists locally
     await mkdir(uploadDirectory, { recursive: true });
 
-    // Generate randomized web-safe file path name
     const cleanFileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
     const destinationPath = path.join(uploadDirectory, cleanFileName);
 
-    // Save image to local disk
     await writeFile(destinationPath, buffer);
-
-    // Provide relative browser-accessible endpoint URL
     const fileUrl = `/uploads/${cleanFileName}`;
 
     return NextResponse.json({ 

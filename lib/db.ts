@@ -1,28 +1,12 @@
-// lib/db.ts (Over-write the Pool initialization section near the top)
+// lib/db.ts
 
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import { Product, Category, Offer, HeroSlide } from './types';
+import { Product, Category, Offer, HeroSlide, ShowcaseVideo, VideoReview, TextReview } from './types';
 
-// Use the working DIRECT_URL as the primary runtime connection for local development
+// Establish a connection pool to Supabase using the node-postgres pg driver
 const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
-
-// temporary diagnostic log to verify connection string parsing and security
-// DIAGNOSTIC LOG (Safe - hides password)
-if (connectionString) {
-  const parsed = new URL(connectionString);
-  console.log("-----------------------------------------");
-  console.log("DATABASE RESOLUTION DIAGNOSTIC:");
-  console.log("Host:", parsed.host);
-  console.log("Database:", parsed.pathname);
-  console.log("Has Password:", !!parsed.password);
-  console.log("Password Length:", parsed.password ? parsed.password.length : 0);
-  console.log("-----------------------------------------");
-}
-
-
-
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
@@ -34,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 /* ==========================================================================
    PRODUCTS CRUD (PRISMA IMPLEMENTATION)
    ========================================================================== */
-// ... keep all other functions (getProducts, saveProduct, etc.) exactly the same below
+
 export async function getProducts(options?: { categorySlug?: string; includeInactive?: boolean }): Promise<Product[]> {
   const dbProducts = await prisma.product.findMany({
     where: {
@@ -209,5 +193,59 @@ export async function getHeroSlides(): Promise<HeroSlide[]> {
     linkUrl: s.linkUrl || undefined,
     order: s.order,
     isActive: s.isActive,
+  }));
+}
+
+/* ==========================================================================
+   SHOWCASE VIDEOS CRUD (PRISMA IMPLEMENTATION)
+   ========================================================================== */
+
+export async function getShowcaseVideos(): Promise<ShowcaseVideo[]> {
+  const dbVideos = await prisma.showcaseVideo.findMany({
+    where: { isActive: true },
+    orderBy: { order: 'asc' },
+  });
+
+  return dbVideos.map((v) => ({
+    id: v.id,
+    title: v.title,
+    badgeText: v.badgeText,
+    videoUrl: v.videoUrl,
+    order: v.order,
+    isActive: v.isActive,
+  }));
+}
+
+/* ==========================================================================
+   CUSTOMER TESTIMONIAL REVIEWS CRUD (PRISMA IMPLEMENTATION)
+   ========================================================================== */
+
+export async function getVideoReviews(options?: { includeInactive?: boolean }): Promise<VideoReview[]> {
+  const db = await prisma.videoReview.findMany({
+    where: options?.includeInactive ? undefined : { isActive: true },
+    orderBy: { order: 'asc' },
+  });
+  return db.map((v) => ({
+    id: v.id,
+    author: v.author,
+    videoUrl: v.videoUrl,
+    thumbnailUrl: v.thumbnailUrl || undefined,
+    order: v.order,
+    isActive: v.isActive,
+  }));
+}
+
+export async function getTextReviews(options?: { includeInactive?: boolean }): Promise<TextReview[]> {
+  const db = await prisma.textReview.findMany({
+    where: options?.includeInactive ? undefined : { isActive: true },
+    orderBy: { date: 'desc' },
+  });
+  return db.map((t) => ({
+    id: t.id,
+    author: t.author,
+    rating: t.rating,
+    comment: t.comment,
+    date: t.date,
+    isActive: t.isActive,
   }));
 }
