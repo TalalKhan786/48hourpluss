@@ -305,3 +305,97 @@ export async function getTextReviews(options?: { includeInactive?: boolean }): P
     return [];
   }
 }
+
+// Order Management Functions
+export async function createOrder(data: {
+  customerName: string;
+  fatherName: string;
+  contactNumber: string;
+  address: string;
+  items: Array<{ productId: string; productName: string; quantity: number; price: string }>;
+  subtotal: number;
+  shippingFee: number;
+  total: number;
+  paymentProofUrl?: string;
+  notes?: string;
+}): Promise<{ id: string; orderNumber: string } | null> {
+  try {
+    const order = await prisma.order.create({
+      data: {
+        customerName: data.customerName,
+        fatherName: data.fatherName,
+        contactNumber: data.contactNumber,
+        address: data.address,
+        subtotal: data.subtotal,
+        shippingFee: data.shippingFee,
+        total: data.total,
+        paymentProofUrl: data.paymentProofUrl,
+        notes: data.notes,
+        items: {
+          create: data.items.map((item) => ({
+            productId: item.productId,
+            productName: item.productName,
+            quantity: item.quantity,
+            price: item.price,
+            subtotal: parseFloat(item.price.replace(/[^0-9]/g, '')) * item.quantity,
+          })),
+        },
+      },
+      include: { items: true },
+    });
+
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber,
+    };
+  } catch (error) {
+    console.error("[v0] Error creating order:", error);
+    return null;
+  }
+}
+
+export async function getOrderById(orderId: string) {
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+    return order;
+  } catch (error) {
+    console.error("[v0] Error fetching order:", error);
+    return null;
+  }
+}
+
+export async function getOrders(options?: { status?: string; limit?: number; offset?: number }) {
+  try {
+    const orders = await prisma.order.findMany({
+      where: options?.status ? { status: options.status } : undefined,
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+      take: options?.limit || 50,
+      skip: options?.offset || 0,
+    });
+    return orders;
+  } catch (error) {
+    console.error("[v0] Error fetching orders:", error);
+    return [];
+  }
+}
+
+export async function updateOrderStatus(orderId: string, status: string, adminNotes?: string) {
+  try {
+    const order = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status,
+        adminNotes: adminNotes || undefined,
+        updatedAt: new Date(),
+      },
+    });
+    return order;
+  } catch (error) {
+    console.error("[v0] Error updating order status:", error);
+    return null;
+  }
+}

@@ -4,7 +4,6 @@
 import { usePathname } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { WhatsAppFloat } from '@/components/whatsapp-float';
 import CartDrawer from '@/components/CartDrawer';
 
 interface StorefrontWrapperProps {
@@ -28,7 +27,6 @@ export default function StorefrontWrapper({ children }: StorefrontWrapperProps) 
       <Header />
       <main>{children}</main>
       <Footer />
-      <WhatsAppFloat />
       
       {/* Mount the interactive Cart Drawer specifically on storefront pages */}
       <CartDrawer />
