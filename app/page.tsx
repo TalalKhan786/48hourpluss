@@ -1,14 +1,20 @@
-// app/page.tsx
-
 import type { Metadata } from "next"
 import { HeroSection } from "@/components/hero-section"
 import { ProductShowcase } from "@/components/product-showcase"
 import { VideoShowcase } from "@/components/video-showcase"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { HomeCtaSection } from "@/components/home-cta-section"
+
+// IMPORT TRUST & VALUE SECTIONS
+import { CertificationsSection } from "@/components/certifications-section"
 import { IngredientBreakdown } from "@/components/ingredient-breakdown"
+import { UsageInstructions } from "@/components/usage-instructions"
+import { PricingSection } from "@/components/pricing-section"
+import { FAQSection } from "@/components/faq-section"
+
 import { getHeroSlides, getProducts, getShowcaseVideos } from "@/lib/db"
-// Enable Incremental Static Regeneration: Cache the page on the Edge for 1 hour [1]
+
+// Enable Incremental Static Regeneration: Cache the page on the Edge and update once every 1 hour
 export const revalidate = 3600; 
 
 export const metadata: Metadata = {
@@ -16,12 +22,6 @@ export const metadata: Metadata = {
 }
 
 export default async function HomePage() {
-  /* 
-     PERFORMANCE OPTIMIZATION: TRIPLE PARALLEL CONCURRENT FETCHING
-     Instead of three sequential awaits (which creates a massive waterfall bottleneck), 
-     we execute all three database queries concurrently using Promise.all [1].
-     This cuts your home page database wait time by nearly 66% [1]!
-  */
   const [slides, products, videos] = await Promise.all([
     getHeroSlides(),
     getProducts(),
@@ -35,14 +35,12 @@ export default async function HomePage() {
 
       {/* 3. PRODUCT SHOWCASE */}
       <ProductShowcase products={products} videos={videos} />
-       
+
+      {/* 4. INGREDIENT BREAKDOWN */}
       <IngredientBreakdown />
-      
+
       {/* 5. CINEMATIC VIDEO THEATER */}
       <VideoShowcase videos={videos} />
-
-      {/* 8. TESTIMONIALS */}
-      <TestimonialsSection />
 
       {/* 10. CLOSING CTA */}
       <HomeCtaSection />

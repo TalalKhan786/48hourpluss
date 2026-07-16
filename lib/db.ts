@@ -1,12 +1,17 @@
-// lib/db.ts
+// lib/db.ts (Overwrite the top connection block)
 
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { Product, Category, Offer, HeroSlide, ShowcaseVideo, VideoReview, TextReview } from './types';
 
-// Establish a connection pool to Supabase using the node-postgres pg driver
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
+/* 
+   PORT-BLOCKING COMPLIANT INITIALIZATION:
+   Connect strictly via DATABASE_URL (Port 6543) [1.1].
+   This routes the connection through standard SSL, bypassing any residential ISP port-5432 blocks [1.1].
+*/
+const connectionString = process.env.DATABASE_URL;
+
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
@@ -18,6 +23,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 /* ==========================================================================
    PRODUCTS CRUD (PRISMA IMPLEMENTATION)
    ========================================================================== */
+// ... keep all other functions (getProducts, saveProduct, etc.) exactly the same below
 
 export async function getProducts(options?: { categorySlug?: string; includeInactive?: boolean }): Promise<Product[]> {
   const dbProducts = await prisma.product.findMany({
