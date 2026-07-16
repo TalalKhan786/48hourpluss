@@ -88,6 +88,35 @@ export interface TextReview {
   isActive: boolean;
 }
 
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: string;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  fatherName: string;
+  contactNumber: string;
+  address: string;
+  items: OrderItem[];
+  subtotal: number;
+  shippingFee: number;
+  total: number;
+  paymentProofUrl?: string;
+  status: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  adminNotes?: string;
+}
+
 // lib/db.ts (Append to the bottom)
 
 export async function getVideoReviews(options?: { includeInactive?: boolean }): Promise<VideoReview[]> {

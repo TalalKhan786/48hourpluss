@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import { Product, Category, Offer, HeroSlide, ShowcaseVideo, VideoReview, TextReview } from './types';
+import { Product, Category, Offer, HeroSlide, ShowcaseVideo, VideoReview, TextReview, Order, OrderItem } from './types';
 
 /* 
    PORT-BLOCKING COMPLIANT INITIALIZATION:
