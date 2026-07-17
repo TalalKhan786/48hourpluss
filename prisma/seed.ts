@@ -146,7 +146,6 @@ async function main() {
     data: {
       name: 'Organic Matcha Powder',
       slug: 'organic-matcha-powder',
-      // Updated pricing string to standard PKR format
       price: 'Rs. 1,999',
       description: 'Ceremonial grade organic green tea powder sourced directly from Uji, Japan.',
       categorySlug: wellness.slug,
@@ -160,6 +159,170 @@ async function main() {
       ingredients: {
         create: [
           { name: '100% Ceremonial Matcha Green Tea' },
+        ],
+      },
+    },
+  });
+
+  // Additional test products
+  await prisma.product.create({
+    data: {
+      name: '48 Hours Plus Herbal Honey',
+      slug: '48-hours-plus-herbal-honey',
+      price: 'Rs. 3,499',
+      description: 'Premium herbal honey formulation for enhanced vitality and performance.',
+      categorySlug: wellness.slug,
+      stock: 100,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1587049352781-30dbd3d2eda9?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Pure Herbal Extract' },
+          { name: 'Premium Honey' },
+          { name: 'Natural Aphrodisiac Herbs' },
+          { name: 'Ginseng Root' },
+        ],
+      },
+      reviews: {
+        create: [
+          { author: 'Hassan R.', rating: 5, comment: 'Excellent quality and results!', date: '2026-06-10' },
+          { author: 'Akram K.', rating: 5, comment: 'Best product I have used!', date: '2026-06-12' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: 'Vitamin C Brightening Face Mask',
+      slug: 'vitamin-c-brightening-face-mask',
+      price: 'Rs. 1,799',
+      description: 'Intensive brightening mask with 20% Vitamin C complex for radiant skin.',
+      categorySlug: skincare.slug,
+      stock: 40,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Vitamin C Complex (20%)' },
+          { name: 'Turmeric Extract' },
+          { name: 'Chamomile' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: 'Retinol Night Serum Advanced',
+      slug: 'retinol-night-serum-advanced',
+      price: 'Rs. 2,899',
+      description: 'Advanced night serum with encapsulated retinol for anti-aging benefits.',
+      categorySlug: skincare.slug,
+      stock: 30,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Encapsulated Retinol' },
+          { name: 'Hyaluronic Acid' },
+          { name: 'Peptides' },
+          { name: 'Squalane' },
+        ],
+      },
+      reviews: {
+        create: [
+          { author: 'Fatima A.', rating: 5, comment: 'My skin looks so much better!', date: '2026-05-20' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: 'Organic Ashwagandha Capsules',
+      slug: 'organic-ashwagandha-capsules',
+      price: 'Rs. 1,599',
+      description: 'Premium organic Ashwagandha for stress relief and vitality.',
+      categorySlug: wellness.slug,
+      stock: 60,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1505252585461-04db1267ae5b?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Organic Ashwagandha Root' },
+          { name: 'Black Pepper Extract' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: 'Intensive Moisturizing Cream',
+      slug: 'intensive-moisturizing-cream',
+      price: 'Rs. 2,299',
+      description: 'Rich, nourishing cream for deep hydration and skin barrier repair.',
+      categorySlug: skincare.slug,
+      stock: 45,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Ceramides' },
+          { name: 'Collagen' },
+          { name: 'Vitamin E' },
+          { name: 'Argan Oil' },
+        ],
+      },
+    },
+  });
+
+  await prisma.product.create({
+    data: {
+      name: 'Pure Ginger Turmeric Tea',
+      slug: 'pure-ginger-turmeric-tea',
+      price: 'Rs. 899',
+      description: 'Organic ginger and turmeric blend for immune support and inflammation relief.',
+      categorySlug: wellness.slug,
+      stock: 80,
+      isActive: true,
+      images: {
+        create: [
+          { url: 'https://images.unsplash.com/photo-1597318086503-fd752c147066?w=600&auto=format&fit=crop&q=80' },
+        ],
+      },
+      ingredients: {
+        create: [
+          { name: 'Organic Ginger Root' },
+          { name: 'Organic Turmeric' },
+          { name: 'Black Pepper' },
+          { name: 'Cinnamon' },
+        ],
+      },
+      reviews: {
+        create: [
+          { author: 'Bilal M.', rating: 4, comment: 'Great taste and health benefits!', date: '2026-06-05' },
         ],
       },
     },
