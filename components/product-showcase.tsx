@@ -22,8 +22,9 @@ export function ProductShowcase({ products, videos }: ProductShowcaseProps) {
 
   const activeVideo = videos && videos.length > 0 ? videos[0] : null;
 
-  const formatPrice = (priceStr: string) => {
-    if (!priceStr) return 'Rs. 0';
+  const formatPrice = (price: string | number) => {
+    if (!price) return 'Rs. 0';
+    const priceStr = String(price);
     if (priceStr.includes('Rs') || priceStr.includes('PKR')) return priceStr;
     const num = parseFloat(priceStr.replace(/[^0-9.]/g, ''));
     return isNaN(num) ? priceStr : `Rs. ${num.toLocaleString('en-US')}`;
