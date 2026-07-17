@@ -10,8 +10,9 @@ export const metadata = {
 };
 
 export default async function CatalogPage() {
+  // Load first page of products for initial render
   const [products, categories] = await Promise.all([
-    getProducts(),
+    getProducts({ limit: 12, offset: 0 }),
     getCategories()
   ]);
 

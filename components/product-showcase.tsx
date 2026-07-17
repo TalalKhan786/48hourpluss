@@ -72,8 +72,8 @@ export function ProductShowcase({ products, videos }: ProductShowcaseProps) {
 
   return (
     /* 
-       SEAMLESS DIFFUSION SHOWCASE:
-       Removed 'border-b border-zinc-200' to diffuse cleanly into the next section [2].
+       OPTIMIZED PRODUCT SHOWCASE:
+       Displays only featured products with lazy-loaded images and optimized rendering [2].
     */
     <section id="product-showcase" className="py-12 sm:py-20 md:py-28 bg-transparent text-white transition-colors duration-300">
       

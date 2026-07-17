@@ -25,18 +25,24 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
    ========================================================================== */
 // ... keep all other functions (getProducts, saveProduct, etc.) exactly the same below
 
-export async function getProducts(options?: { categorySlug?: string; includeInactive?: boolean }): Promise<Product[]> {
+export async function getProducts(options?: { categorySlug?: string; includeInactive?: boolean; limit?: number; offset?: number; featuredOnly?: boolean }): Promise<Product[]> {
   try {
+    const limit = options?.limit || 12; // Default to 12 items per page
+    const offset = options?.offset || 0;
+
     const dbProducts = await prisma.product.findMany({
       where: {
         isActive: options?.includeInactive ? undefined : true,
         categorySlug: options?.categorySlug || undefined,
       },
       include: {
-        images: true,
+        images: { take: 1 }, // Only first image for initial load
         ingredients: true,
         reviews: true,
       },
+      take: limit,
+      skip: offset,
+      orderBy: { id: 'asc' },
     });
 
     return dbProducts.map((p) => ({
@@ -60,6 +66,51 @@ export async function getProducts(options?: { categorySlug?: string; includeInac
     }));
   } catch (error) {
     console.error("[v0] Database connection error in getProducts:", error);
+    return [];
+  }
+}
+
+// Optimized query for homepage - only featured products with minimal data
+export async function getFeaturedProducts(limit: number = 4): Promise<Product[]> {
+  try {
+    const dbProducts = await prisma.product.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        price: true,
+        categorySlug: true,
+        description: true,
+        images: { select: { url: true }, take: 1 },
+        ingredients: { select: { name: true } },
+        reviews: { select: { id: true, rating: true } },
+      },
+      take: limit,
+      orderBy: { id: 'asc' },
+    });
+
+    return dbProducts.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      price: p.price,
+      categorySlug: p.categorySlug,
+      description: p.description,
+      stock: 100,
+      isActive: true,
+      images: p.images.map((img) => img.url),
+      ingredients: p.ingredients.map((ing) => ing.name),
+      reviews: p.reviews.map((rev) => ({
+        id: rev.id,
+        author: '',
+        rating: rev.rating,
+        comment: '',
+        date: '',
+      })),
+    }));
+  } catch (error) {
+    console.error("[v0] Database connection error in getFeaturedProducts:", error);
     return [];
   }
 }
