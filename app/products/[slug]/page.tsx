@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { getProductBySlug, getProducts } from '@/lib/db';
 import ImageGallery from '@/components/ImageGallery';
 import AddToCartButton from '@/components/AddToCartButton';
-import { MessageCircle, Star, ArrowLeft } from 'lucide-react';
-
-const WHATSAPP_NUMBER = "923194405935"; // Your WhatsApp number
+import { Star, ArrowLeft } from 'lucide-react';
 
 // Cache the product details page on the Edge and update every 1 hour [1]
 export const revalidate = 3600;
@@ -56,11 +54,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const averageRating = reviewsCount > 0 
     ? Math.round(product.reviews.reduce((acc, r) => acc + r.rating, 0) / reviewsCount) 
     : 5;
-
-  // Pre-filled single-item fallback WhatsApp link
-  const textMessage = `Hello! I would like to order: *${product.name}* \nPrice: *${formatPrice(product.price)}*.\n\nPlease confirm availability and payment options.`;
-  const encodedText = encodeURIComponent(textMessage);
-  const whatsAppUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedText}`;
 
   /* ==========================================================================
      DYNAMIC E-COMMERCE JSON-LD SCHEMA GENERATION
@@ -111,7 +104,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-transparent text-zinc-100 py-12 pt-24 container mx-auto px-4 transition-colors duration-300 ease-in-out">
+    <main className="min-h-screen bg-background text-foreground py-12 pt-24 container mx-auto px-4 transition-colors duration-300 ease-in-out">
       
       {/* 
          DYNAMIC JSON-LD SCHEMA SCRIPT TAG:
@@ -125,7 +118,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
       {/* Breadcrumbs */}
       <nav className="mb-8">
-        <Link href="/products" className="text-sm font-semibold text-yellow-600 hover:text-yellow-500 flex items-center gap-1.5">
+        <Link href="/products" className="text-sm font-semibold text-yellow-600 dark:text-yellow-400 hover:text-yellow-500 dark:hover:text-yellow-300 flex items-center gap-1.5 transition-colors">
           <ArrowLeft className="w-4 h-4" />
           Back to Catalog
         </Link>
@@ -138,10 +131,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
         <div className="lg:col-span-6 mt-10 lg:mt-0 space-y-6">
           <div className="space-y-2">
-            <span className="text-xs font-semibold text-yellow-500 uppercase tracking-widest block">
+            <span className="text-xs font-semibold text-yellow-600 dark:text-yellow-400 uppercase tracking-widest block">
               {product.categorySlug}
             </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-100 font-serif leading-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground font-serif leading-tight">
               {product.name}
             </h1>
             
@@ -151,12 +144,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   <Star
                     key={i}
                     className={`w-4 h-4 ${
-                      i < averageRating ? 'fill-amber-400 text-amber-400' : 'text-zinc-850'
+                      i < averageRating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-xs text-zinc-400 font-medium ml-1">
+              <span className="text-xs text-muted-foreground font-medium ml-1">
                 ({reviewsCount} Customer {reviewsCount === 1 ? 'Review' : 'Reviews'})
               </span>
             </div>
@@ -164,17 +157,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
           <div className="space-y-4">
             <h3 className="sr-only">Description</h3>
-            <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-light whitespace-pre-line">
+            <p className="text-sm sm:text-base text-foreground/80 leading-relaxed font-light whitespace-pre-line">
               {product.description || 'No description provided for this dynamic formulation.'}
             </p>
           </div>
 
           {/* Dynamic Ingredients list */}
           {product.ingredients.length > 0 && (
-            <div className="border-t border-zinc-900 pt-6">
-              <h3 className="text-sm font-semibold text-zinc-100">Key Ingredients</h3>
+            <div className="border-t border-border pt-6">
+              <h3 className="text-sm font-semibold text-foreground">Key Ingredients</h3>
               <div className="mt-4">
-                <ul className="grid grid-cols-2 gap-x-4 gap-y-2 list-disc pl-5 text-xs sm:text-sm text-zinc-400">
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-2 list-disc pl-5 text-xs sm:text-sm text-foreground/70">
                   {product.ingredients.map((ingredient, idx) => (
                     <li key={idx} className="pl-1">
                       {ingredient}
@@ -186,64 +179,48 @@ export default async function ProductDetailPage({ params }: PageProps) {
           )}
 
           {/* Checkout Controls */}
-          <div className="rounded-3xl border border-zinc-900 bg-zinc-950/40 p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-baseline justify-between border-b border-zinc-900 pb-4">
-              <span className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">Special Offer Price</span>
-              <p className="text-3xl tracking-tight text-yellow-400 font-bold font-serif">
+          <div className="rounded-3xl border border-border bg-card/40 p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div className="flex items-baseline justify-between border-b border-border pb-4">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Special Offer Price</span>
+              <p className="text-3xl tracking-tight text-yellow-600 dark:text-yellow-400 font-bold font-serif">
                 {formatPrice(product.price)}
               </p>
             </div>
 
             {/* Interactive Add to Cart selector */}
             <AddToCartButton product={product} />
-
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-zinc-900"></div>
-              <span className="flex-shrink mx-4 text-zinc-500 text-[10px] uppercase tracking-widest font-semibold">or buy instantly</span>
-              <div className="flex-grow border-t border-zinc-900"></div>
-            </div>
-
-            <a
-              href={whatsAppUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex w-full items-center justify-center rounded-md border border-emerald-600/30 bg-emerald-600/10 px-8 py-4 text-base font-semibold text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all duration-300 hover:scale-[1.02] shadow-sm"
-            >
-              <MessageCircle className="w-5 h-5 mr-3" />
-              Instant Order via WhatsApp
-            </a>
           </div>
         </div>
       </div>
 
       {/* Customer Reviews Section */}
-      <section className="mt-20 border-t border-zinc-900 pt-12 max-w-7xl mx-auto">
-        <h2 className="text-xl font-bold text-zinc-100 font-serif mb-6 flex items-center gap-2">
+      <section className="mt-20 border-t border-border pt-12 max-w-7xl mx-auto">
+        <h2 className="text-xl font-bold text-foreground font-serif mb-6 flex items-center gap-2">
           <span>💬</span> Customer Feedback
         </h2>
-        <div className="space-y-6 divide-y divide-zinc-900">
+        <div className="space-y-6 divide-y divide-border">
           {product.reviews.length === 0 ? (
-            <p className="text-sm text-zinc-500">No reviews yet. Be the first to leave feedback on your purchase!</p>
+            <p className="text-sm text-muted-foreground">No reviews yet. Be the first to leave feedback on your purchase!</p>
           ) : (
             product.reviews.map((review) => (
               <div key={review.id} className="pt-6 first:pt-0">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-zinc-200">{review.author}</p>
-                    <p className="text-xs text-zinc-500">{review.date}</p>
+                    <p className="text-sm font-semibold text-card-foreground">{review.author}</p>
+                    <p className="text-xs text-muted-foreground">{review.date}</p>
                   </div>
                   <div className="flex items-center">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span
                         key={i}
-                        className={`text-lg ${i < review.rating ? 'text-amber-400' : 'text-zinc-800'}`}
+                        className={`text-lg ${i < review.rating ? 'text-amber-400' : 'text-muted-foreground'}`}
                       >
                         ★
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="mt-3 text-sm italic text-zinc-300 leading-relaxed font-light">
+                <div className="mt-3 text-sm italic text-foreground/80 leading-relaxed font-light">
                   &ldquo;{review.comment}&rdquo;
                 </div>
               </div>

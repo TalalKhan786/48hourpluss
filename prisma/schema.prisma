@@ -107,3 +107,34 @@ model TextReview {
   date      String
   isActive  Boolean  @default(true)
 }
+
+// Order Management Models
+model Order {
+  id                    String      @id @default(uuid())
+  orderNumber           String      @unique @default(cuid())
+  customerName          String
+  fatherName            String
+  contactNumber         String
+  address               String
+  items                 OrderItem[]
+  subtotal              Float
+  shippingFee           Float       @default(0)
+  total                 Float
+  paymentProofUrl       String?     // URL to uploaded screenshot
+  status                String      @default("pending") // pending, confirmed, shipped, delivered, cancelled
+  notes                 String?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  adminNotes            String?
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  productName String
+  quantity  Int
+  price     String
+  subtotal  Float
+}

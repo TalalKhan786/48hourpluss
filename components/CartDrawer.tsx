@@ -5,10 +5,9 @@ import { useState } from 'react';
 import { useCart } from './CartProvider';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Trash2, Plus, Minus, ShoppingBag, User, MapPin, MessageSquare } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
-
-const WHATSAPP_NUMBER = "923194405935"; // Your WhatsApp number
+import CheckoutModal from './CheckoutModal';
 
 export default function CartDrawer() {
   const {
@@ -21,46 +20,7 @@ export default function CartDrawer() {
     getCartItemCount,
   } = useCart();
 
-  const [customerName, setCustomerName] = useState('');
-  const [deliveryAddress, setDeliveryAddress] = useState('');
-  const [customNotes, setCustomNotes] = useState('');
-  const [showValidationWarning, setShowValidationWarning] = useState(false);
-
-  const handleCheckout = () => {
-    if (cart.length === 0) return;
-
-    if (!customerName.trim() || !deliveryAddress.trim()) {
-      setShowValidationWarning(true);
-      return;
-    }
-
-    setShowValidationWarning(false);
-
-    let messageText = `Hello 48hoursplus! I'd like to place an order:\n\n🛒 *ORDER DETAILS*:\n`;
-    
-    cart.forEach((item, index) => {
-      messageText += `${index + 1}. *${item.product.name}*\n`;
-      messageText += `   - Quantity: ${item.quantity}\n`;
-      messageText += `   - Price: ${item.product.price} each\n`;
-    });
-
-    messageText += `\n--------------------------------\n`;
-    messageText += `💵 *Subtotal*: Rs. ${getCartSubtotal().toLocaleString('en-US')}\n`;
-    messageText += `🚚 *Delivery*: Calculated upon address validation\n\n`;
-    
-    messageText += `📋 *CUSTOMER INFO*:\n`;
-    messageText += `👤 *Name*: ${customerName.trim()}\n`;
-    messageText += `📍 *Address*: ${deliveryAddress.trim()}\n`;
-    
-    if (customNotes.trim()) {
-      messageText += `💬 *Notes/Regards*: ${customNotes.trim()}\n`;
-    }
-
-    const encodedText = encodeURIComponent(messageText);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedText}`;
-    
-    window.open(whatsappUrl, '_blank');
-  };
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -137,70 +97,7 @@ export default function CartDrawer() {
                 ))}
               </div>
 
-              {/* CUSTOMER INFORMATION FORM */}
-              <div className="border-t border-border pt-6 space-y-4">
-                <h3 className="text-sm font-semibold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider flex items-center gap-2 font-serif">
-                  <MapPin className="w-4 h-4" />
-                  Delivery Information
-                </h3>
 
-                {/* 1. Customer Name */}
-                <div className="space-y-1">
-                  <label htmlFor="customerName" className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
-                    <User className="w-3.5 h-3.5" />
-                    Customer Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="customerName"
-                    type="text"
-                    required
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full rounded bg-background border border-input px-3 py-2 text-sm text-foreground focus:border-yellow-500 focus:outline-none placeholder-muted-foreground/60"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                {/* 2. Complete Address */}
-                <div className="space-y-1">
-                  <label htmlFor="deliveryAddress" className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
-                    <MapPin className="w-3.5 h-3.5" />
-                    Complete Delivery Address <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    id="deliveryAddress"
-                    required
-                    rows={3}
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    className="w-full rounded bg-background border border-input px-3 py-2 text-sm text-foreground focus:border-yellow-500 focus:outline-none placeholder-muted-foreground/60 resize-none"
-                    placeholder="Enter house no, street name, city, area details"
-                  />
-                </div>
-
-                {/* 3. Regards */}
-                <div className="space-y-1">
-                  <label htmlFor="customNotes" className="text-xs text-muted-foreground flex items-center gap-1.5 font-medium">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Regards / Delivery Instructions <span className="text-muted-foreground/60">(Optional)</span>
-                  </label>
-                  <textarea
-                    id="customNotes"
-                    rows={2}
-                    value={customNotes}
-                    onChange={(e) => setCustomNotes(e.target.value)}
-                    className="w-full rounded bg-background border border-input px-3 py-2 text-sm text-foreground focus:border-yellow-500 focus:outline-none placeholder-muted-foreground/60 resize-none"
-                    placeholder="Special instructions (e.g. leave at gate, call first)"
-                  />
-                </div>
-
-                {/* Validation Warnings */}
-                {showValidationWarning && (!customerName.trim() || !deliveryAddress.trim()) && (
-                  <div className="p-3 text-xs rounded bg-destructive/10 border border-destructive/20 text-destructive text-center animate-pulse">
-                    Please provide your name and complete delivery address.
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </div>
@@ -214,17 +111,19 @@ export default function CartDrawer() {
             </div>
 
             <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-md font-semibold flex items-center justify-center gap-2 transition-transform duration-300 hover:scale-[1.02]"
-              onClick={handleCheckout}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-md font-semibold flex items-center justify-center gap-2 transition-transform duration-300 hover:scale-[1.02]"
+              onClick={() => setIsCheckoutOpen(true)}
             >
-              <MessageCircle className="w-5 h-5" />
-              Checkout via WhatsApp
+              Proceed to Checkout
             </Button>
             <p className="text-center text-xs text-muted-foreground mt-2">
-              All details will be pre-filled inside WhatsApp before sending.
+              Fill your details and proceed with payment verification
             </p>
           </div>
         )}
+
+        {/* Checkout Modal */}
+        <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
       </SheetContent>
     </Sheet>
   );

@@ -6,7 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { MessageCircle, Menu, ShoppingBag } from "lucide-react"
+import { Menu, ShoppingBag } from "lucide-react"
 import { useCart } from "./CartProvider" // <-- Import the cart hook!
 
 const navLinks = [
@@ -22,10 +22,6 @@ export function Header() {
   
   // Destructure cart helper actions
   const { getCartItemCount, setIsCartOpen } = useCart()
-
-  const openWhatsApp = () => {
-    window.open("https://wa.me/923194405935?text=Hi, I'm interested in 48 Hours Plus Herbal Honey", "_blank")
-  }
 
   return (
     <header className="fixed top-0 w-full bg-black/95 backdrop-blur-sm z-50 border-b border-yellow-500/20">
@@ -59,11 +55,6 @@ export function Header() {
                 {getCartItemCount()}
               </span>
             )}
-          </Button>
-
-          <Button className="hidden sm:flex bg-green-600 hover:bg-green-700 text-white" onClick={openWhatsApp}>
-            <MessageCircle className="w-4 h-4 mr-2" />
-            WhatsApp
           </Button>
 
           {/* Mobile menu trigger */}
@@ -106,17 +97,6 @@ export function Header() {
             >
               <ShoppingBag className="w-4 h-4" />
               View Cart ({getCartItemCount()})
-            </Button>
-
-            <Button
-              className="mt-2 bg-green-600 hover:bg-green-700 text-white"
-              onClick={() => {
-                setIsMenuOpen(false)
-                openWhatsApp()
-              }}
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              WhatsApp
             </Button>
           </nav>
         </SheetContent>

@@ -15,7 +15,8 @@ import {
   X, 
   ExternalLink,
   Film,
-  Star // <-- Add this icon
+  Star,
+  ShoppingCart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -43,11 +44,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
 const navItems = [
   { name: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
   { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Categories', href: '/admin/categories', icon: FolderTree },
   { name: 'Hero Slides', href: '/admin/hero-slides', icon: Sliders },
   { name: 'Videos', href: '/admin/showcase-videos', icon: Film },
-  { name: 'Reviews', href: '/admin/reviews', icon: Star }, // <-- Add this tab
+  { name: 'Reviews', href: '/admin/reviews', icon: Star },
 ];
   
 

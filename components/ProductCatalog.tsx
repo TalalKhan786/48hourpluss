@@ -1,12 +1,12 @@
 // components/ProductCatalog.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Star, ShoppingCart } from 'lucide-react';
+import { ArrowUpRight, Star, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from './CartProvider';
 
 interface ProductCatalogProps {
@@ -14,8 +14,11 @@ interface ProductCatalogProps {
   categories: string[];
 }
 
+const ITEMS_PER_PAGE = 12;
+
 export default function ProductCatalog({ products, categories }: ProductCatalogProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const { addToCart } = useCart();
 
   const handleCheckoutAdd = (product: Product) => {
@@ -29,16 +32,30 @@ export default function ProductCatalog({ products, categories }: ProductCatalogP
     return isNaN(num) ? priceStr : `Rs. ${num.toLocaleString('en-US')}`;
   };
 
-  const filteredProducts = selectedCategory
-    ? products.filter((p) => p.categorySlug === selectedCategory)
-    : products;
+  const filteredProducts = useMemo(() => 
+    selectedCategory
+      ? products.filter((p) => p.categorySlug === selectedCategory)
+      : products,
+    [selectedCategory, products]
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const paginatedProducts = filteredProducts.slice(startIdx, endIdx);
+
+  const handleCategoryChange = (category: string | null) => {
+    setSelectedCategory(category);
+    setCurrentPage(1); // Reset to first page
+  };
 
   return (
     <div className="space-y-8">
       {/* Categories Filter Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-border pb-4">
         <button
-          onClick={() => setSelectedCategory(null)}
+          onClick={() => handleCategoryChange(null)}
           className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
             selectedCategory === null
               ? 'bg-yellow-500 text-black font-semibold'
@@ -50,7 +67,7 @@ export default function ProductCatalog({ products, categories }: ProductCatalogP
         {categories.map((category) => (
           <button
             key={category}
-            onClick={() => setSelectedCategory(category.toLowerCase())}
+            onClick={() => handleCategoryChange(category.toLowerCase())}
             className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
               selectedCategory === category.toLowerCase()
                 ? 'bg-yellow-500 text-black font-semibold'
@@ -68,8 +85,9 @@ export default function ProductCatalog({ products, categories }: ProductCatalogP
           No products found in this category.
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredProducts.map((product) => {
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {paginatedProducts.map((product) => {
             const reviewsCount = product.reviews.length;
             const averageRating = reviewsCount > 0 
               ? Math.round(product.reviews.reduce((acc, r) => acc + r.rating, 0) / reviewsCount) 
@@ -143,7 +161,51 @@ export default function ProductCatalog({ products, categories }: ProductCatalogP
               </div>
             );
           })}
-        </div>
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8 pt-8 border-t border-border">
+              <Button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                variant="outline"
+                size="sm"
+                className="gap-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Previous
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded transition-colors ${
+                      currentPage === page
+                        ? 'bg-yellow-500 text-black font-semibold'
+                        : 'bg-muted text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                variant="outline"
+                size="sm"
+                className="gap-1"
+              >
+                Next
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

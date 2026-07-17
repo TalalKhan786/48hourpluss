@@ -12,7 +12,7 @@ import { UsageInstructions } from "@/components/usage-instructions"
 import { PricingSection } from "@/components/pricing-section"
 import { FAQSection } from "@/components/faq-section"
 
-import { getHeroSlides, getProducts, getShowcaseVideos } from "@/lib/db"
+import { getHeroSlides, getFeaturedProducts, getShowcaseVideos } from "@/lib/db"
 
 // Enable Incremental Static Regeneration: Cache the page on the Edge and update once every 1 hour
 export const revalidate = 3600; 
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [slides, products, videos] = await Promise.all([
     getHeroSlides(),
-    getProducts(),
+    getFeaturedProducts(4),
     getShowcaseVideos()
   ]);
 
